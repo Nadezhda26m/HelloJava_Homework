@@ -25,6 +25,7 @@ public class BubbleSort {
     public static void loggingBubbleSortIterations(int[] array, String separator, Logger log) {
         int size = array.length;
         int temp;
+        log.info("Запись всех итераций пузырьковой сортировки числового массива");
         for (int i = 0; i < size - 1; i++) {
             log.log(Level.INFO, ">>>>> {0}",
                     ArrayOperations.convertArrayToString(array, separator));
