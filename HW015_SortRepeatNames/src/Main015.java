@@ -44,7 +44,8 @@ public class Main015 {
                 "Иван Ежов";
         String[] initial = str.split("\n");
 
-        HashMap<String, Integer> listNames = new HashMap<>();
+        // получить список уникальных имен с количеством их повторений
+        TreeMap<String, Integer> listNames = new TreeMap<>();
         String[] name;
         for (String item : initial) {
             name = item.split(" ");
@@ -55,32 +56,31 @@ public class Main015 {
             }
         }
 
+        // поменять ключи и значения местами
         TreeMap<Integer, ArrayList<String>> listRepeat = new TreeMap<>();
+        ArrayList<String> someNames;
         Integer count;
-        ArrayList<String> someNames = new ArrayList<>();
         for (var item : listNames.entrySet()) {
             count = item.getValue();
-            System.out.println(count);
-            someNames.clear();
-            if (listRepeat.containsKey(count)) { // false
+            if (listRepeat.containsKey(count)) {
                 someNames = listRepeat.get(count);
-                System.out.println(someNames);
                 String strNew = item.getKey();
                 someNames.add(strNew);
-                System.out.println(someNames);
+                listRepeat.put(count, someNames);
             } else {
+                someNames = new ArrayList<>();
                 someNames.add(item.getKey());
-                System.out.println("______");
-                System.out.println(someNames);
+                listRepeat.put(count, someNames);
             }
-            listRepeat.put(count, someNames);
         }
 
-
-        System.out.println(listNames);
-        System.out.println(listRepeat);
-        // {Анна=3, Иван=4, Кристина=1, Марина=2, Мария=3, Павел=1, Петр=3, Светлана=1}
-        System.out.println(listNames.values());
-
+        // Вывод повторяющихся имен с количеством повторений
+        for (Integer key : listRepeat.descendingMap().keySet()) {
+            for (String value : listRepeat.descendingMap().get(key)) {
+                if (key != 1) {
+                    System.out.printf("%d раза: %s\n", key, value);
+                } // else System.out.printf("%d раз: %s\n", key, value);
+            }
+        }
     }
 }
