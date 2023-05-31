@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /* Реализовать алгоритм пирамидальной сортировки (HeapSort).
             0
@@ -9,7 +10,7 @@ import java.util.Random;
 
 public class Main016 {
 
-    public static int size = 2;
+    public static int size = 12;
 
     public static void main(String[] args) {
 
@@ -20,12 +21,14 @@ public class Main016 {
         System.out.println("Неотсортированная куча");
         printHeap(numbers);
 
-        heapSort(numbers);
+        AtomicInteger cnt = new AtomicInteger();
+        heapSort(numbers, cnt);
 
         System.out.println("Отсортированная куча (по убыванию)");
         printHeap(numbers);
         System.out.println("Отсортированный массив чисел (по убыванию)");
         System.out.println(Arrays.toString(numbers));
+        System.out.println("counter = " + cnt);
     }
 
     public static int[] fillArray(int size, int minValue, int maxValue) {
@@ -37,35 +40,43 @@ public class Main016 {
         return array;
     }
 
-    public static void heapSort(int[] array) {
-        heapSort(array, size);
+    public static void heapSort(int[] array, AtomicInteger cnt) {
+        heapSort(array, size, cnt);
     }
 
-    private static void findMinTopHeap(int[] array, int index) {
-        if (index < 0) return;
-        for (int i = 1; i < 3; i++) {
-            // проверяем сначала слева, при необходимости меняем, затем справа
-            if (index * 2 + i < size && array[index] > array[index * 2 + i]) {
-                int tmp = array[index];
-                array[index] = array[index * 2 + i];
-                array[index * 2 + i] = tmp;
-                printHeap(array);
-                System.out.println();
-            }
+    private static void findMinTopHeap(int[] array, int indexNode, AtomicInteger cnt) {
+        if (indexNode < 0) return;
+        cnt.incrementAndGet();
+        int smaller = indexNode;
+        if (indexNode * 2 + 1 < size && array[smaller] > array[indexNode * 2 + 1])
+            smaller = indexNode * 2 + 1;
+        if (indexNode * 2 + 2 < size && array[smaller] > array[indexNode * 2 + 2])
+            smaller = indexNode * 2 + 2;
+        if (smaller != indexNode) {
+            int tmp = array[indexNode];
+            array[indexNode] = array[smaller];
+            array[smaller] = tmp;
+            printHeap(array);
+            System.out.println();
+            cnt.incrementAndGet();
         }
-        findMinTopHeap(array, --index);
+        findMinTopHeap(array, --indexNode, cnt);
     }
 
-    private static void heapSort(int[] array, int lastIndex) {
+
+
+    private static void heapSort(int[] array, int lastIndex, AtomicInteger cnt) {
         if (lastIndex <= 0) return;
-        findMinTopHeap(array, lastIndex / 2 - 1);
+        findMinTopHeap(array, lastIndex / 2 - 1, cnt);
         if (lastIndex == size) lastIndex--;
         int tmp = array[0];
         array[0] = array[lastIndex];
         array[lastIndex] = tmp;
+        cnt.incrementAndGet();
         System.out.printf("new last - %d(%d)\n", tmp, lastIndex);
         printHeap(array);
-        heapSort(array, --lastIndex);
+        System.out.println();
+        heapSort(array, --lastIndex, cnt);
     }
 
     public static void printHeap(int[] numbers) {
