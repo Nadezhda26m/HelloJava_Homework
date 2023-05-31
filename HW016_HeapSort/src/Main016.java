@@ -1,5 +1,5 @@
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Random;
 
 /* Реализовать алгоритм пирамидальной сортировки (HeapSort).
             0
@@ -8,61 +8,82 @@ import java.util.Collections;
  7  8  9 10   11 12 13 14      */
 
 public class Main016 {
+
+    public static int size = 2;
+
     public static void main(String[] args) {
 
-        // String num = "34 76 95 15 38 90 4 18";
-        // String num = "34 76 95 15 38 90 4";
-        String num = "34 14 76 37 95 2 15 38 18 90 4 18";
-        String[] nums = num.split(" ");
-        size = nums.length;
-        ArrayList<Integer> numbers = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            numbers.add(Integer.parseInt(nums[i]));
-        }
+        int[] numbers = fillArray(size, 1, 99);
+        // printHeap рассчитан на числа с 1 или 2 цифрами
         System.out.println("Исходный массив");
-        System.out.printf("[%s]\n", num);
+        System.out.println(Arrays.toString(numbers));
         System.out.println("Неотсортированная куча");
         printHeap(numbers);
-        // ставим минимальное значение на вершину кучи
-        System.out.println("Первое просеивание");
-        findMinTopHeap(numbers, size / 2 - 1);
-        printHeap(numbers);
-        System.out.println("Отсортированная куча (по убыванию)");
-        heapSort(numbers, size - 1);
-        printHeap(numbers);
 
+        heapSort(numbers);
+
+        System.out.println("Отсортированная куча (по убыванию)");
+        printHeap(numbers);
         System.out.println("Отсортированный массив чисел (по убыванию)");
-        System.out.println(numbers);
+        System.out.println(Arrays.toString(numbers));
     }
 
-    public static int size;
+    public static int[] fillArray(int size, int minValue, int maxValue) {
+        int[] array = new int[size];
+        Random rand = new Random();
+        for (int i = 0; i < size; i++) {
+            array[i] = rand.nextInt(minValue, maxValue + 1);
+        }
+        return array;
+    }
 
-    public static void printHeap(ArrayList<Integer> numbers) {
-        int j = 0, degree = 0;
-        while (j < size) {
-            for (int k = 0; k < Math.pow(2, degree); k++) {
-                System.out.printf("%3d(%2d) ", numbers.get(j), j++);
-                if (j == size) break;
+    public static void heapSort(int[] array) {
+        heapSort(array, size);
+    }
+
+    private static void findMinTopHeap(int[] array, int index) {
+        if (index < 0) return;
+        for (int i = 1; i < 3; i++) {
+            // проверяем сначала слева, при необходимости меняем, затем справа
+            if (index * 2 + i < size && array[index] > array[index * 2 + i]) {
+                int tmp = array[index];
+                array[index] = array[index * 2 + i];
+                array[index * 2 + i] = tmp;
+                printHeap(array);
+                System.out.println();
             }
+        }
+        findMinTopHeap(array, --index);
+    }
+
+    private static void heapSort(int[] array, int lastIndex) {
+        if (lastIndex <= 0) return;
+        findMinTopHeap(array, lastIndex / 2 - 1);
+        if (lastIndex == size) lastIndex--;
+        int tmp = array[0];
+        array[0] = array[lastIndex];
+        array[lastIndex] = tmp;
+        System.out.printf("new last - %d(%d)\n", tmp, lastIndex);
+        printHeap(array);
+        heapSort(array, --lastIndex);
+    }
+
+    public static void printHeap(int[] numbers) {
+        int j = 0, degree = 0, raw = 0;
+        while (Math.pow(2, raw) <= size) raw++;
+        int tab = 7 * raw;
+        while (j < size) {
+            int a = (int) (Math.pow(2, raw - 1) * 7 - 1) / 2;
+            System.out.printf("%s%2d(%2d)", " ".repeat(a - degree + 2), numbers[j], j++);
+            if (raw == 1) tab = 1;
+            for (int k = 1; k < Math.pow(2, degree); k++) {
+                if (j == size) break;
+                System.out.printf("%s%2d(%2d)", " ".repeat(tab), numbers[j], j++);
+            }
+            tab = a - 5;
+            raw--;
             degree++;
             System.out.print("\n");
         }
-    }
-
-    public static void findMinTopHeap(ArrayList<Integer> numbers, int index) {
-        if (index < 0) return;
-        for (int i = 1; i < 3; i++) {
-            if (index * 2 + i < size && numbers.get(index) > numbers.get(index * 2 + i)) {
-                Collections.swap(numbers, index, index * 2 + i);
-            }
-        }
-        findMinTopHeap(numbers, --index);
-    }
-
-    public static void heapSort(ArrayList<Integer> heap, int lastIndex) {
-        if (lastIndex == 0) return;
-        Collections.swap(heap, 0, lastIndex);
-        findMinTopHeap(heap, --lastIndex / 2 - 1);
-        heapSort(heap, lastIndex);
     }
 }
